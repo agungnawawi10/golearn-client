@@ -21,6 +21,7 @@ export default function RegistrationPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [approvingId, setApprovingId] = useState<number | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -85,6 +86,7 @@ export default function RegistrationPage() {
                 <TableHead>Address</TableHead>
                 <TableHead>Birth Date</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Action</TableHead>
                 <TableHead>Created</TableHead>
               </TableRow>
             </TableHeader>
@@ -98,6 +100,37 @@ export default function RegistrationPage() {
                   <TableCell>{registration.form_data.address}</TableCell>
                   <TableCell>{registration.form_data.birth_date}</TableCell>
                   <TableCell>{registration.status}</TableCell>
+                  <TableCell>
+                    {registration.status !== "approved" && (
+                      <Button
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            setError("")
+                            setApprovingId(registration.id)
+                            await api.post(`/registrations/${registration.id}/approve`)
+                            setRegistrations((prev) =>
+                              prev.map((r) => (r.id === registration.id ? { ...r, status: "approved" } : r))
+                            )
+                          } catch (err) {
+                            if (axios.isAxiosError(err)) {
+                              const backendMessage =
+                                (err.response?.data as { message?: string } | undefined)?.message ??
+                                err.message
+                              setError(backendMessage || "Gagal approve registration")
+                            } else {
+                              setError("Gagal approve registration")
+                            }
+                          } finally {
+                            setApprovingId(null)
+                          }
+                        }}
+                        disabled={approvingId === registration.id}
+                      >
+                        {approvingId === registration.id ? "Approving..." : "Approve"}
+                      </Button>
+                    )}
+                  </TableCell>
                   <TableCell>{registration.created_at}</TableCell>
                 </TableRow>
               ))}
