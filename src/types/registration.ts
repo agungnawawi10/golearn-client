@@ -15,3 +15,4 @@ export type Registration = {
   created_at: string
   updated_at: string
 }
+

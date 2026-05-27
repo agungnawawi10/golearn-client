@@ -14,7 +14,7 @@ import { CoachLoading } from "./coach-loading"
 import { CoachError } from "./coach-error"
 import { CoachEmpty } from "./coach-empty"
 import { CoachRow } from "./coach-row"
-import { useCoaches } from "@/hooks/use-coaches"
+import { useCoaches } from "@/hooks/coach/use-coaches"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "../ui/card"
 
 
@@ -57,7 +57,7 @@ export function CoachTable() {
                 <TableHead>Phone</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
-                {/* <TableHead>Created</TableHead> */}
+                <TableHead>Created</TableHead>
                 <TableHead>Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -74,10 +74,6 @@ export function CoachTable() {
             </TableBody>
           </Table>
         )}
-
-        <Button asChild variant="outline">
-          <Link href="/dashboard">Kembali ke dashboard</Link>
-        </Button>
       </CardContent>
     </Card>
   )

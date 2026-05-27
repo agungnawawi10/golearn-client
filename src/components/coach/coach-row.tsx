@@ -7,7 +7,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table"
-import { useDeleteCoach } from "@/hooks/use-delete-coach"
+import { useDeleteCoach } from "@/hooks/coach/use-delete-coach"
 
 import type { Coach } from "@/types/coach"
 
@@ -43,6 +43,10 @@ export function CoachRow({ coach, onDeleted }: CoachRowProps) {
 
       <TableCell>
         {coach.username ?? "-"}
+      </TableCell>
+
+      <TableCell>
+        {coach.phone ?? "-"}
       </TableCell>
 
       <TableCell>

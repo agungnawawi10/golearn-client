@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
-import { useCreateCoach } from "@/hooks/use-create-coach"
+import { useCreateCoach } from "@/hooks/coach/use-create-coach"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 

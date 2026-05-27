@@ -104,7 +104,7 @@ export function CardDemo() {
 
 export default function LoginPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_#f8fafc,_#e2e8f0_60%,_#cbd5e1)] px-4 py-12 dark:bg-[radial-gradient(circle_at_top,_#0f172a,_#020617_60%,_#000)]">
+    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#f8fafc,#e2e8f0_60%,#cbd5e1)] px-4 py-12 dark:bg-[radial-gradient(circle_at_top,#0f172a,#020617_60%,#000)]">
       <CardDemo />
     </main>
   )
