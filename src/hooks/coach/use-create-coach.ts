@@ -3,6 +3,7 @@
 import { createCoach } from "@/services/coach-service"
 import { CreateCoachPayload } from "@/types/coach"
 import { useState } from "react"
+import { mutate } from "swr"
 
 export function useCreateCoach() {
   const [loading, setLoading] = useState(false)
@@ -14,6 +15,7 @@ export function useCreateCoach() {
       setError("")
 
       await createCoach(payload)
+      await mutate("/coaches")
       return true
     } catch (error) {
       setError("Gagal menambahkan coach")
@@ -25,7 +27,7 @@ export function useCreateCoach() {
   return {
     submit,
     loading,
-    error
+    error,
   }
 
 }

@@ -1,62 +1,33 @@
 "use client"
 
+import useSWR from "swr"
 import axios from "axios"
-import { useEffect, useState } from "react"
-
 import { getRegistrations } from "@/services/registration-service"
 import type { Registration } from "@/types/registration"
 
-export function useRegistrations() {
-  const [registrations, setRegistrations] = useState<Registration[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+export function useRegistrations(search = "") {
+  const trimmedSearch = search.trim()
+  const { data, error, isLoading, mutate } = useSWR<Registration[]>(
+    ["/registrations", trimmedSearch],
+    async () => {
+      return await getRegistrations({ search: trimmedSearch })
+    },
+    { revalidateOnFocus: false }
+  )
 
-  useEffect(() => {
-    const controller = new AbortController()
-    let isMounted = true
-
-    async function fetchRegistrations() {
-      try {
-        setLoading(true)
-        setError("")
-
-        const data = await getRegistrations({ signal: controller.signal })
-
-        if (isMounted) {
-          setRegistrations(data)
-        }
-      } catch (err) {
-        if (!isMounted || axios.isCancel(err)) {
-          return
-        }
-
-        if (axios.isAxiosError(err)) {
-          const backendMessage =
-            (err.response?.data as { message?: string } | undefined)?.message ??
-            err.message
-          setError(backendMessage || "Gagal mengambil data registration")
-        } else {
-          setError("Gagal mengambil data registration")
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false)
-        }
-      }
+  let errorMessage = ""
+  if (error) {
+    if (axios.isAxiosError(error)) {
+      errorMessage = (error.response?.data as { message?: string } | undefined)?.message ?? error.message
+    } else {
+      errorMessage = "Gagal mengambil data registration"
     }
-
-    fetchRegistrations()
-
-    return () => {
-      isMounted = false
-      controller.abort()
-    }
-  }, [])
+  }
 
   return {
-    registrations,
-    setRegistrations,
-    loading,
-    error,
+    registrations: data || [],
+    setRegistrations: mutate,
+    loading: isLoading,
+    error: errorMessage,
   }
 }

@@ -1,15 +1,19 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
+import { useCreateAthlete } from "@/hooks/athletes/use-create-athlete"
 import { useUpdateAthlete } from "@/hooks/athletes/use-update-athlete"
 import type { Athlete, UpdateAthletePayload } from "@/types/athletes"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 
-type AthleteEditFormProps = {
-  athlete: Athlete
+type AthleteFormMode = "create" | "edit"
+
+type AthleteFormProps = {
+  athlete?: Athlete
+  mode?: AthleteFormMode
 }
 
 type FormState = {
@@ -20,7 +24,15 @@ type FormState = {
   status: string
 }
 
-const initialForm = (athlete: Athlete): FormState => ({
+const createInitialForm = (): FormState => ({
+  full_name: "",
+  gender: "",
+  rank_id: "",
+  photo: "",
+  status: "",
+})
+
+const editInitialForm = (athlete: Athlete): FormState => ({
   full_name: athlete.full_name,
   gender: athlete.gender,
   rank_id: String(athlete.rank.id),
@@ -28,11 +40,21 @@ const initialForm = (athlete: Athlete): FormState => ({
   status: athlete.status,
 })
 
-export function AthleteEditForm({ athlete }: AthleteEditFormProps) {
+export function AthleteForm({ athlete, mode = athlete ? "edit" : "create" }: AthleteFormProps) {
   const router = useRouter()
-  const { submit, loading, error } = useUpdateAthlete()
+  const createAthlete = useCreateAthlete()
+  const updateAthlete = useUpdateAthlete()
 
-  const [form, setForm] = useState<FormState>(() => initialForm(athlete))
+  const [form, setForm] = useState<FormState>(() =>
+    mode === "edit" && athlete ? editInitialForm(athlete) : createInitialForm(),
+  )
+
+  useEffect(() => {
+    setForm(mode === "edit" && athlete ? editInitialForm(athlete) : createInitialForm())
+  }, [athlete, mode])
+
+  const loading = mode === "edit" ? updateAthlete.loading : createAthlete.loading
+  const error = mode === "edit" ? updateAthlete.error : createAthlete.error
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -45,7 +67,10 @@ export function AthleteEditForm({ athlete }: AthleteEditFormProps) {
       status: form.status,
     }
 
-    const success = await submit(athlete.id, payload)
+    const success =
+      mode === "edit"
+        ? await updateAthlete.submit(athlete?.id ?? "", payload)
+        : await createAthlete.submit(payload)
 
     if (success) {
       router.push("/dashboard/athletes")
@@ -116,7 +141,7 @@ export function AthleteEditForm({ athlete }: AthleteEditFormProps) {
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <Button type="submit" disabled={loading}>
-        {loading ? "Menyimpan..." : "Simpan Perubahan"}
+        {loading ? "Menyimpan..." : mode === "edit" ? "Simpan Perubahan" : "Tambah Athlete"}
       </Button>
     </form>
   )

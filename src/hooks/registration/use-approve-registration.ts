@@ -2,6 +2,7 @@
 
 import axios from "axios"
 import { useState } from "react"
+import { mutate } from "swr"
 
 import { approveRegistration } from "@/services/registration-service"
 
@@ -15,6 +16,7 @@ export function useApproveRegistration() {
       setError("")
 
       await approveRegistration(id)
+      await mutate("/registrations")
       return true
     } catch (error) {
       if (axios.isAxiosError(error)) {

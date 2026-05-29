@@ -24,6 +24,8 @@ export type Athlete = {
 export type AthletesResponse = {
   data: Athlete[]
 }
+export type CreateAthletePayload = UpdateAthletePayload
+
 export type UpdateAthletePayload = {
   full_name: string
   gender: string

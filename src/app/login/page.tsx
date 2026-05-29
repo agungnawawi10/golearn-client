@@ -53,7 +53,7 @@ export function CardDemo() {
       <CardHeader>
         <CardTitle>Login ke akun</CardTitle>
         <CardDescription>
-          Masukkan email dan password yang diberikan backend.
+          Masukkan email dan password dengan benar
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -77,6 +77,7 @@ export function CardDemo() {
               <Input
                 id="password"
                 type="password"
+                placeholder="password"
                 required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}

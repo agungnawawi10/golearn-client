@@ -1,10 +1,11 @@
 "use client"
 
 import axios from "axios"
+import { useState } from "react"
+import { mutate } from "swr"
 
 import { updateCoach } from "@/services/coach-service"
 import type { UpdateCoachPayload } from "@/types/coach"
-import { useState } from "react"
 
 export function useUpdateCoach() {
   const [loading, setLoading] = useState(false)
@@ -16,6 +17,7 @@ export function useUpdateCoach() {
       setError("")
 
       await updateCoach(id, payload)
+      await mutate("/coaches")
       return true
     } catch (error) {
       if (axios.isAxiosError(error)) {

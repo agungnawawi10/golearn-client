@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 import axios from "axios"
 import { useEffect, useState } from "react"
 
-import { CoachEditForm } from "@/components/coach/coach-edit-form"
+import { CoachForm } from "@/components/coach/coach-form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getCoachById } from "@/services/coach-service"
@@ -77,7 +77,7 @@ export default function EditCoachPage() {
 
         {!loading && error && <p className="text-sm text-red-500">{error}</p>}
 
-        {!loading && !error && coach && <CoachEditForm coach={coach} />}
+        {!loading && !error && coach && <CoachForm coach={coach} mode="edit" />}
 
         <Button asChild variant="outline">
           <Link href="/dashboard/coach">Kembali ke daftar coach</Link>

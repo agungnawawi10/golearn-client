@@ -1,62 +1,41 @@
 "use client"
 
+import useSWR from "swr"
 import axios from "axios"
-import { useEffect, useState } from "react"
-
 import { getAthletes } from "@/services/athletes-service"
 import type { Athlete } from "@/types/athletes"
 
-export function useAthletes() {
-  const [athletes, setAthletes] = useState<Athlete[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-
-  useEffect(() => {
-    const controller = new AbortController()
-    let isMounted = true
-
-    async function fetchAthletes() {
-      try {
-        setLoading(true)
-        setError("")
-
-        const data = await getAthletes({ signal: controller.signal })
-
-        if (isMounted) {
-          setAthletes(data)
-        }
-      } catch (err) {
-        if (!isMounted || axios.isCancel(err)) {
-          return
-        }
-
-        if (axios.isAxiosError(err)) {
-          const backendMessage =
-            (err.response?.data as { message?: string } | undefined)?.message ??
-            err.message
-          setError(backendMessage || "Gagal mengambil data athlete")
-        } else {
-          setError("Gagal mengambil data athlete")
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false)
-        }
-      }
+export function useAthletes(search = "") {
+  const trimmedSearch = search.trim()
+  // SWR menggunakan key unik (misal: '/athletes') untuk menyimpan cache data ini
+  const { data, error, isLoading, mutate } = useSWR<Athlete[]>(
+    ["/athletes", trimmedSearch], 
+    async () => {
+      // Memanggil fungsi fetcher bawaan service kamu
+      return await getAthletes({ search: trimmedSearch })
+    },
+    {
+      revalidateOnFocus: false, // Mencegah fetch ulang otomatis saat user pindah tab browser
+      dedupingInterval: 5000,    // Jika dalam 5 detik user bolak-balik halaman, jangan fetch ulang
     }
+  )
 
-    fetchAthletes()
-
-    return () => {
-      isMounted = false
-      controller.abort()
+  // Memformat pesan error dari Axios agar sesuai dengan struktur lama kamu
+  let errorMessage = ""
+  if (error) {
+    if (axios.isAxiosError(error)) {
+      errorMessage =
+        (error.response?.data as { message?: string } | undefined)?.message ??
+        error.message
+    } else {
+      errorMessage = "Gagal mengambil data athlete"
     }
-  }, [])
+  }
 
   return {
-    athletes,
-    setAthletes,
-    loading,
-    error,
+    athletes: data || [],      // Jika data belum ada/cache kosong, default ke array kosong
+    setAthletes: mutate,       // 'mutate' berfungsi mirip seperti setAthletes jika ingin memperbarui cache lokal
+    loading: isLoading,
+    error: errorMessage,
   }
 }

@@ -2,6 +2,7 @@
 
 import axios from "axios"
 import { useState } from "react"
+import { mutate } from "swr"
 
 import { deleteCoach } from "@/services/coach-service"
 
@@ -15,6 +16,7 @@ export function useDeleteCoach() {
       setError("")
 
       await deleteCoach(id)
+      await mutate("/coaches")
       return true
     } catch (error) {
       if (axios.isAxiosError(error)) {

@@ -1,9 +1,5 @@
 "use client"
 
-import Link from "next/link"
-import { ShieldCheck } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
@@ -15,6 +11,7 @@ import { useAuth } from "@/components/auth/auth-provider"
 import { useEffect, useState } from "react"
 import { api } from "@/lib/api"
 import type { Stats } from "@/types/stats"
+import { DashboardOverviewChart } from "@/components/dashboard/dashboard-overview-chart"
 
 export default function Dashboard() {
     const { user, isHydrated } = useAuth()
@@ -90,6 +87,8 @@ export default function Dashboard() {
                     </CardContent>
                 </Card>
             </div>
+
+            <DashboardOverviewChart stats={stats} />
         </div>
     )
 }

@@ -2,6 +2,7 @@
 
 import axios from "axios"
 import { useState } from "react"
+import { mutate } from "swr"
 
 import { updateAthlete } from "@/services/athletes-service"
 import type { UpdateAthletePayload } from "@/types/athletes"
@@ -16,6 +17,7 @@ export function useUpdateAthlete() {
       setError("")
 
       await updateAthlete(id, payload)
+      await mutate("/athletes")
       return true
     } catch (error) {
       if (axios.isAxiosError(error)) {

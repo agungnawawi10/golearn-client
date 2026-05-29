@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 import axios from "axios"
 import { useEffect, useState } from "react"
 
-import { AthleteEditForm } from "@/components/athletes/athlete-edit-form"
+import { AthleteForm } from "@/components/athletes/athlete-form"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getAthleteById } from "@/services/athletes-service"
@@ -79,7 +79,7 @@ export default function EditAthletePage() {
 
 				{!loading && error && <p className="text-sm text-red-500">{error}</p>}
 
-				{!loading && !error && athlete && <AthleteEditForm athlete={athlete} />}
+				{!loading && !error && athlete && <AthleteForm athlete={athlete} mode="edit" />}
 
 				<Button asChild variant="outline">
 					<Link href="/dashboard/athletes">Kembali ke daftar athlete</Link>

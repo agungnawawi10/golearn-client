@@ -1,158 +1,161 @@
 "use client"
 
+import * as React from "react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller, useForm } from "react-hook-form"
+import * as z from "zod"
 
 import { useCreateCoach } from "@/hooks/coach/use-create-coach"
+import { useUpdateCoach } from "@/hooks/coach/use-update-coach"
+import type { Coach, CreateCoachPayload, UpdateCoachPayload } from "@/types/coach"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 
-const initialForm = {
-  email: "",
-  password: "",
-  full_name: "",
-  username: "",
-  phone: "",
+type CoachFormMode = "create" | "edit"
+
+type CoachFormProps = {
+  coach?: Coach
+  mode?: CoachFormMode
 }
 
-type FormState = typeof initialForm
-type FormField = keyof FormState
+const schema = z.object({
+  full_name: z.string().min(1, "Nama lengkap wajib diisi"),
+  username: z.string().min(1, "Username wajib diisi"),
+  phone: z.string().min(1, "No. HP wajib diisi"),
+  email: z.string().email("Email tidak valid"),
+  password: z.string().optional(),
+})
 
-const requiredFields: FormField[] = ["full_name", "username", "phone", "email", "password"]
+type FormValues = z.infer<typeof schema>
 
-export function CoachForm() {
-  const { submit, loading, error } = useCreateCoach()
+export function CoachForm({ coach, mode = coach ? "edit" : "create" }: CoachFormProps) {
   const router = useRouter()
+  const createCoach = useCreateCoach()
+  const updateCoach = useUpdateCoach()
 
-  const [form, setForm] = useState(initialForm)
-  const [touched, setTouched] = useState<Partial<Record<FormField, boolean>>>({})
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      full_name: coach?.full_name ?? "",
+      username: coach?.username ?? "",
+      phone: coach?.phone ?? "",
+      email: coach?.email ?? "",
+      password: "",
+    },
+  })
 
-  const fieldErrors = {
-    full_name: form.full_name.trim() ? "" : "required",
-    username: form.username.trim() ? "" : "required",
-    phone: form.phone.trim() ? "" : "required",
-    email: form.email.trim() ? "" : "required",
-    password: form.password.trim() ? "" : "required",
-  } satisfies Record<FormField, string>
+  React.useEffect(() => {
+    form.reset({
+      full_name: coach?.full_name ?? "",
+      username: coach?.username ?? "",
+      phone: coach?.phone ?? "",
+      email: coach?.email ?? "",
+      password: "",
+    })
+  }, [coach, mode])
 
-  const isFormComplete = requiredFields.every((field) => form[field].trim() !== "")
+  const loading = mode === "edit" ? updateCoach.loading : createCoach.loading
+  const error = mode === "edit" ? updateCoach.error : createCoach.error
 
-  function handleBlur(field: FormField) {
-    setTouched((current) => ({
-      ...current,
-      [field]: true,
-    }))
-  }
+  async function onSubmit(values: FormValues) {
+    const payload =
+      mode === "edit"
+        ? ({
+            email: values.email,
+            full_name: values.full_name,
+            username: values.username,
+            phone: values.phone,
+            ...(values.password?.trim() ? { password: values.password } : {}),
+          } as UpdateCoachPayload)
+        : ({
+            email: values.email,
+            password: values.password ?? "",
+            full_name: values.full_name,
+            username: values.username,
+            phone: values.phone,
+          } as CreateCoachPayload)
 
-  function handleChange(field: FormField, value: string) {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }))
-  }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-
-    const nextTouched = requiredFields.reduce(
-      (accumulator, field) => ({
-        ...accumulator,
-        [field]: true,
-      }),
-      {} as Partial<Record<FormField, boolean>>,
-    )
-
-    setTouched(nextTouched)
-
-    if (!isFormComplete) {
-      return
-    }
-
-    const success = await submit(form)
+    const success =
+      mode === "edit"
+        ? await updateCoach.submit(coach?.id ?? "", payload as UpdateCoachPayload)
+        : await createCoach.submit(payload as CreateCoachPayload)
 
     if (success) {
-      setForm(initialForm)
-      setTouched({})
+      form.reset()
       router.push("/dashboard/coach")
     }
   }
 
-  function showRequiredMessage(field: FormField) {
-    return Boolean(touched[field] || isFormComplete) && fieldErrors[field] === "required"
-  }
-
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-1">
-          <Input
-            placeholder="Nama Lengkap"
-            value={form.full_name}
-            aria-invalid={showRequiredMessage("full_name")}
-            onBlur={() => handleBlur("full_name")}
-            onChange={(e) => handleChange("full_name", e.target.value)}
-          />
-          {showRequiredMessage("full_name") && (
-            <p className="text-sm text-red-500">required</p>
+        <Controller
+          name="full_name"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Nama Lengkap</label>
+              <Input {...field} placeholder="Nama Lengkap" aria-invalid={fieldState.invalid} />
+              {fieldState.error && <p className="text-sm text-red-500">{fieldState.error.message}</p>}
+            </div>
           )}
-        </div>
+        />
 
-        <div className="space-y-1">
-          <Input
-            placeholder="Username"
-            value={form.username}
-            aria-invalid={showRequiredMessage("username")}
-            onBlur={() => handleBlur("username")}
-            onChange={(e) => handleChange("username", e.target.value)}
-          />
-          {showRequiredMessage("username") && (
-            <p className="text-sm text-red-500">required</p>
+        <Controller
+          name="username"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Username</label>
+              <Input {...field} placeholder="Username" aria-invalid={fieldState.invalid} />
+              {fieldState.error && <p className="text-sm text-red-500">{fieldState.error.message}</p>}
+            </div>
           )}
-        </div>
+        />
 
-        <div className="space-y-1">
-          <Input
-            placeholder="No.HP"
-            value={form.phone}
-            aria-invalid={showRequiredMessage("phone")}
-            onBlur={() => handleBlur("phone")}
-            onChange={(e) => handleChange("phone", e.target.value)}
-          />
-          {showRequiredMessage("phone") && <p className="text-sm text-red-500">required</p>}
-        </div>
-
-        <div className="space-y-1">
-          <Input
-            placeholder="Email"
-            value={form.email}
-            aria-invalid={showRequiredMessage("email")}
-            onBlur={() => handleBlur("email")}
-            onChange={(e) => handleChange("email", e.target.value)}
-          />
-          {showRequiredMessage("email") && <p className="text-sm text-red-500">required</p>}
-        </div>
-
-        <div className="space-y-1 md:col-span-2">
-          <Input
-            placeholder="Password"
-            type="password"
-            value={form.password}
-            aria-invalid={showRequiredMessage("password")}
-            onBlur={() => handleBlur("password")}
-            onChange={(e) => handleChange("password", e.target.value)}
-          />
-          {showRequiredMessage("password") && (
-            <p className="text-sm text-red-500">required</p>
+        <Controller
+          name="phone"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <div className="space-y-1">
+              <label className="text-sm font-medium">No.HP</label>
+              <Input {...field} placeholder="No.HP" aria-invalid={fieldState.invalid} />
+              {fieldState.error && <p className="text-sm text-red-500">{fieldState.error.message}</p>}
+            </div>
           )}
-        </div>
+        />
+
+        <Controller
+          name="email"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <div className="space-y-1">
+              <label className="text-sm font-medium">Email</label>
+              <Input {...field} placeholder="Email" aria-invalid={fieldState.invalid} />
+              {fieldState.error && <p className="text-sm text-red-500">{fieldState.error.message}</p>}
+            </div>
+          )}
+        />
+
+        <Controller
+          name="password"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <div className="space-y-1 md:col-span-2">
+              <label className="text-sm font-medium">{mode === "edit" ? "Password baru" : "Password"}</label>
+              <Input {...field} type="password" placeholder={mode === "edit" ? "Password baru" : "Password"} aria-invalid={fieldState.invalid} />
+              {mode === "create" && fieldState.error && <p className="text-sm text-red-500">{fieldState.error.message}</p>}
+            </div>
+          )}
+        />
       </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={loading || !isFormComplete}>
-          {loading ? "Menyimpan..." : "Tambah Coach"}
+        <Button type="submit" disabled={loading}>
+          {loading ? "Menyimpan..." : mode === "edit" ? "Simpan Perubahan" : "Tambah Coach"}
         </Button>
       </div>
     </form>

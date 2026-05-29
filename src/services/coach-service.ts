@@ -2,9 +2,10 @@ import { api } from "@/lib/api"
 import type { Coach, CreateCoachPayload, UpdateCoachPayload } from "@/types/coach"
 
 // Get data Coach
-export async function getCoaches(options?: { signal?: AbortSignal }) {
+export async function getCoaches(options?: { signal?: AbortSignal; search?: string }) {
   const res = await api.get<{ data: Coach[] }>("coaches", {
     signal: options?.signal,
+    params: options?.search ? { search: options.search } : undefined,
   })
   return res.data.data ?? []
 }
