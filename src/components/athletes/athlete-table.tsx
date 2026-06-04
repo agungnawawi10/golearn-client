@@ -84,14 +84,6 @@ export function AthletesTable() {
     setSubmittedQuery(draftQuery)
   }
 
-  if (loading) {
-    return <LoadingState message="Memuat data athlete..." />
-  }
-
-  if (error) {
-    return <ErrorState message={error} />
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -115,7 +107,11 @@ export function AthletesTable() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {athletes.length === 0 ? (
+        {loading ? (
+          <LoadingState variant="table" rows={6} />
+        ) : error ? (
+          <ErrorState message={error} />
+        ) : athletes.length === 0 ? (
           <EmptyState
             message={submittedQuery.trim() ? "Tidak ada athlete yang cocok dengan pencarian." : "Belum ada data athlete."}
           />

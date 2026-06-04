@@ -50,6 +50,7 @@ export function AthleteForm({ athlete, mode = athlete ? "edit" : "create" }: Ath
   )
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm(mode === "edit" && athlete ? editInitialForm(athlete) : createInitialForm())
   }, [athlete, mode])
 

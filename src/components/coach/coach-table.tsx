@@ -85,14 +85,6 @@ export function CoachTable() {
     setSubmittedQuery(draftQuery)
   }
 
-  if (loading) {
-    return <LoadingState message="Memuat data coach..." />
-  }
-
-  if (error) {
-    return <ErrorState message={error} />
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -119,11 +111,14 @@ export function CoachTable() {
             </Button>
           </div>
         </CardAction>
-        {/* <CardDescription>Data coach dari backend Laravel.</CardDescription> */}
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {coaches.length === 0 ? (
+        {loading ? (
+          <LoadingState variant="table" rows={6} />
+        ) : error ? (
+          <ErrorState message={error} />
+        ) : coaches.length === 0 ? (
           <EmptyState
             message={submittedQuery.trim() ? "Tidak ada coach yang cocok dengan pencarian." : "Belum ada data coach."}
           />

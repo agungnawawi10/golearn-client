@@ -4,6 +4,7 @@ import * as React from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   ChartContainer,
   ChartLegend,
@@ -16,6 +17,7 @@ import type { Stats } from "@/types/stats"
 
 type DashboardOverviewChartProps = {
   stats: Stats | null
+  loading?: boolean
 }
 
 const chartConfig = {
@@ -25,7 +27,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function DashboardOverviewChart({ stats }: DashboardOverviewChartProps) {
+export function DashboardOverviewChart({ stats, loading }: DashboardOverviewChartProps) {
   const chartData = React.useMemo(
     () => [
       {
@@ -63,33 +65,44 @@ export function DashboardOverviewChart({ stats }: DashboardOverviewChartProps) {
       </CardHeader>
 
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer config={chartConfig} className="h-72 w-full">
-          <BarChart data={chartData} layout="vertical">
-            <CartesianGrid horizontal={false} strokeDasharray="3 3" />
-            <XAxis type="number" tickLine={false} axisLine={false} />
-            <YAxis
-              type="category"
-              dataKey="metric"
-              tickLine={false}
-              axisLine={false}
-              width={110}
-            />
+        {loading ? (
+          <div className="flex h-72 flex-col justify-between py-4">
+            {["80%", "55%", "40%"].map((w, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton className="h-4 w-24 shrink-0" />
+                <Skeleton className="h-7 rounded-lg" style={{ width: w }} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig} className="h-72 w-full">
+            <BarChart data={chartData} layout="vertical">
+              <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+              <XAxis type="number" tickLine={false} axisLine={false} />
+              <YAxis
+                type="category"
+                dataKey="metric"
+                tickLine={false}
+                axisLine={false}
+                width={110}
+              />
 
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  indicator="dot"
-                  labelFormatter={(value) => `Metric: ${value}`}
-                />
-              }
-            />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    indicator="dot"
+                    labelFormatter={(value) => `Metric: ${value}`}
+                  />
+                }
+              />
 
-            <Bar dataKey="total" radius={10} fill="var(--color-total)" />
+              <Bar dataKey="total" radius={10} fill="var(--color-total)" />
 
-            <ChartLegend content={<ChartLegendContent />} />
-          </BarChart>
-        </ChartContainer>
+              <ChartLegend content={<ChartLegendContent />} />
+            </BarChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   )

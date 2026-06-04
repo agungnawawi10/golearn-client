@@ -34,18 +34,21 @@ const sidebarItems = [
     label: "Daftar Coach",
     icon: Users,
     exact: false,
+    roles: ["admin"],
   },
   {
     href: "/dashboard/registration",
     label: "Daftar Registration",
     icon: PlusSquare,
     exact: false,
+    roles: ["admin"],
   },
   {
     href: "/dashboard/athletes",
     label: "Daftar Athlete",
     icon: ShieldCheck,
     exact: false,
+    roles: ["admin", "coach"],
   },
 ]
 
@@ -60,7 +63,7 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
 
   function handleLogout() {
     logout()
@@ -71,6 +74,13 @@ export function DashboardSidebar({
     if (exact) return pathname === href
     return pathname === href || pathname.startsWith(`${href}/`)
   }
+
+  const userRole = user?.role ?? "Member"
+  const filteredSidebarItems = sidebarItems.filter((item) => {
+    if (!item.roles) return true
+    const normalizedUserRole = userRole.toLowerCase()
+    return item.roles.map((r) => r.toLowerCase()).includes(normalizedUserRole)
+  })
 
   return (
     <TooltipProvider delayDuration={150}>
@@ -109,7 +119,7 @@ export function DashboardSidebar({
 
           {/* ── Navigation ── */}
           <nav className="flex flex-1 flex-col gap-0.5 p-2">
-            {sidebarItems.map((item) => {
+            {filteredSidebarItems.map((item) => {
               const Icon = item.icon
               const active = isActive(item.href, item.exact)
 

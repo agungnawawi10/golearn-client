@@ -5,6 +5,7 @@ import type { ReactNode } from "react"
 
 import { DashboardNavbar } from "@/components/layouts/navbar"
 import { DashboardSidebar } from "@/components/layouts/sidebar"
+import { RoleGuard } from "@/components/auth/role-guard"
 
 export function DashboardShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -20,7 +21,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         />
 
         <section className="min-w-0 flex-1 space-y-4">
-          {children}
+          <RoleGuard>{children}</RoleGuard>
         </section>
       </div>
     </div>

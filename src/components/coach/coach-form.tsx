@@ -53,7 +53,7 @@ export function CoachForm({ coach, mode = coach ? "edit" : "create" }: CoachForm
       email: coach?.email ?? "",
       password: "",
     })
-  }, [coach, mode])
+  }, [coach, mode, form])
 
   const loading = mode === "edit" ? updateCoach.loading : createCoach.loading
   const error = mode === "edit" ? updateCoach.error : createCoach.error

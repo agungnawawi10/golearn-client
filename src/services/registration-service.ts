@@ -2,13 +2,24 @@ import { api } from "@/lib/api"
 
 import type { Registration } from "@/types/registration"
 
-export async function getRegistrations(options?: { signal?: AbortSignal; search?: string }) {
-  const response = await api.get<Registration[]>("/registrations", {
+// export async function getRegistrations(options?: { signal?: AbortSignal; search?: string }) {
+//   const response = await api.get<Registration>("/registrations", {
+//     signal: options?.signal,
+//     params: options?.search ? { search: options.search } : undefined,
+//   })
+
+//   return response.data ?? []
+// }
+export async function getRegistrations(options?: {
+  signal?: AbortSignal
+  search?: string
+}) {
+  const response = await api.get("/registrations", {
     signal: options?.signal,
     params: options?.search ? { search: options.search } : undefined,
   })
 
-  return response.data ?? []
+  return response.data.data ?? []
 }
 
 export async function approveRegistration(id: number) {

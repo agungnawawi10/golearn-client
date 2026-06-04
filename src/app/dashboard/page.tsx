@@ -7,58 +7,54 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { useAuth } from "@/components/auth/auth-provider"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useDashboardStats } from "@/hooks/dashboard/use-dashboard-stats"
 import { DashboardOverviewChart } from "@/components/dashboard/dashboard-overview-chart"
 
-export default function Dashboard() {
-    const { user } = useAuth()
-    const { stats, loading: loadingStats, error: statsError } = useDashboardStats()
+const statCards = [
+    {
+        key: "athletes" as const,
+        title: "Atlet",
+        description: "Jumlah athlete terdaftar",
+    },
+    {
+        key: "registrations" as const,
+        title: "Registrations",
+        description: "Permintaan pendaftaran",
+    },
+    {
+        key: "coaches" as const,
+        title: "Coaches",
+        description: "Jumlah coach",
+    },
+]
 
-    const displayName =
-        user?.full_name ?? user?.name ?? user?.username ?? user?.email ?? "User"
+export default function Dashboard() {
+    const { stats, loading: loadingStats } = useDashboardStats()
 
     return (
         <div className="grid gap-6">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Atlet</CardTitle>
-                        <CardDescription>Jumlah athlete terdaftar</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-semibold">
-                            {loadingStats ? "—" : stats?.athletes ?? 0}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Registrations</CardTitle>
-                        <CardDescription>Permintaan pendaftaran</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-semibold">
-                            {loadingStats ? "—" : stats?.registrations ?? 0}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Coaches</CardTitle>
-                        <CardDescription>Jumlah coach</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-semibold">
-                            {loadingStats ? "—" : stats?.coaches ?? 0}
-                        </div>
-                    </CardContent>
-                </Card>
+                {statCards.map((card) => (
+                    <Card key={card.key}>
+                        <CardHeader>
+                            <CardTitle>{card.title}</CardTitle>
+                            <CardDescription>{card.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {loadingStats ? (
+                                <Skeleton className="h-8 w-16" />
+                            ) : (
+                                <div className="text-2xl font-semibold">
+                                    {stats?.[card.key] ?? 0}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
 
-            <DashboardOverviewChart stats={stats} />
+            <DashboardOverviewChart stats={stats} loading={loadingStats} />
         </div>
     )
 }

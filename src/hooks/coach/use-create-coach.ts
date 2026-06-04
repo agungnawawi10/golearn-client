@@ -17,8 +17,8 @@ export function useCreateCoach() {
       await createCoach(payload)
       await mutate("/coaches")
       return true
-    } catch (error) {
-      setError("Gagal menambahkan coach")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal menambahkan coach")
       return false
     } finally {
       setLoading(false)

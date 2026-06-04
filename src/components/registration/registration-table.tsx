@@ -70,14 +70,6 @@ export function RegistrationTable() {
     setSubmittedQuery(draftQuery)
   }
 
-  if (loading) {
-    return <LoadingState message="Memuat data registration..." />
-  }
-
-  if (error) {
-    return <ErrorState message={error} />
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -101,7 +93,11 @@ export function RegistrationTable() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {registrations.length === 0 ? (
+        {loading ? (
+          <LoadingState variant="table" rows={6} />
+        ) : error ? (
+          <ErrorState message={error} />
+        ) : registrations.length === 0 ? (
           <EmptyState
             message={submittedQuery.trim() ? "Tidak ada registration yang cocok dengan pencarian." : "Belum ada data registration."}
           />
