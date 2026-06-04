@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/components/auth/auth-provider"
+import Link from "next/link"
 
 export function CardDemo() {
   const router = useRouter()
@@ -93,9 +94,12 @@ export function CardDemo() {
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Memproses..." : "Login"}
           </Button>
-          {/* <Button variant="outline" className="w-full" type="button" asChild>
-            <Link href="/">Kembali ke home</Link>
-          </Button> */}
+          <div className="text-sm text-muted-foreground">
+            Belum Punya akun?{" "}
+            <Link href="/register" className="text-primary underline-offset-4 hover:underline">
+              Daftar di sini
+            </Link>
+          </div>
         </CardFooter>
       </form>
     </Card>

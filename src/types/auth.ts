@@ -39,3 +39,4 @@ export type LoginResponse = {
     user?: AuthUser
   }
 }
+
