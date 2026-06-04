@@ -8,45 +8,15 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { useAuth } from "@/components/auth/auth-provider"
-import { useEffect, useState } from "react"
-import { api } from "@/lib/api"
-import type { Stats } from "@/types/stats"
+import { useDashboardStats } from "@/hooks/dashboard/use-dashboard-stats"
 import { DashboardOverviewChart } from "@/components/dashboard/dashboard-overview-chart"
 
 export default function Dashboard() {
-    const { user, isHydrated } = useAuth()
+    const { user } = useAuth()
+    const { stats, loading: loadingStats, error: statsError } = useDashboardStats()
 
     const displayName =
         user?.full_name ?? user?.name ?? user?.username ?? user?.email ?? "User"
-    const [stats, setStats] = useState<Stats | null>(null)
-    const [loadingStats, setLoadingStats] = useState(false)
-    const [statsError, setStatsError] = useState("")
-
-    useEffect(() => {
-        let mounted = true
-
-        async function fetchStats() {
-            try {
-                setLoadingStats(true)
-                setStatsError("")
-                const res = await api.get<Stats>("/stats/dashboard")
-                if (!mounted) return
-                setStats(res.data)
-            } catch (err) {
-                if (!mounted) return
-                setStatsError("Gagal memuat statistik")
-            } finally {
-                if (!mounted) return
-                setLoadingStats(false)
-            }
-        }
-
-        fetchStats()
-
-        return () => {
-            mounted = false
-        }
-    }, [])
 
     return (
         <div className="grid gap-6">
