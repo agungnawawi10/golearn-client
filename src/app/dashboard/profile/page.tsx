@@ -74,9 +74,9 @@ export default function ProfilePage() {
           <CardTitle>Aksi</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          <Button asChild>
+          {/* <Button asChild>
             <Link href="/dashboard/profile/edit">Edit profile</Link>
-          </Button>
+          </Button> */}
           <Button variant="outline" onClick={handleLogout}>
             Logout
           </Button>

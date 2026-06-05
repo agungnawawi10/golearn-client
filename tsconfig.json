@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "src/components/training-logs/training-logs-form..tss"  ],
   "exclude": ["node_modules"]
 }
