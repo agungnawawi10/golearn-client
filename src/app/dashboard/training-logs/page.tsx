@@ -18,7 +18,7 @@ export default function TrainingLogsPage() {
   const { data: logs = [], isLoading, error } = useSWR<TrainingLog[]>("/coach/training-logs", () => getTrainingLogs())
 
   return (
-    <div className="space-y-6 p-6 max-w-5xl mx-auto">
+    <div className="space-y-6 p-6 max-w-6xl mx-auto">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Log Latihan Dojo</h1>
