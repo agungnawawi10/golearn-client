@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCreateTrainingLog } from "@/hooks/training-logs/use-training-logs."
+import { Textarea } from "../ui/textarea"
 
 
 interface LogFormProps {
