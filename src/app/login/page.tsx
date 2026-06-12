@@ -53,7 +53,7 @@ export function CardDemo() {
       <CardHeader>
         <CardTitle>Login ke akun</CardTitle>
         <CardDescription>
-          Masukkan email dan password dengan benar
+          Masukkan email dan password 
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
